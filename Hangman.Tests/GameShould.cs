@@ -1,5 +1,7 @@
+using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Hangman.Tests
 {
@@ -9,22 +11,36 @@ namespace Hangman.Tests
     public class GameShould : IClassFixture<GameFixture>, IAsyncLifetime
     {
         private readonly Game _sut;
+        private readonly ITestOutputHelper _output;
+        private ITest _test;
 
         /// <summary>
-        /// Initializes a game instance to be the system under test.
+        /// Initializes a game instance to be the system under test plus the 
+        /// current test representation.
         /// </summary>
         /// <param name="gameFixture"></param>
-        public GameShould(GameFixture gameFixture)
+        public GameShould(GameFixture gameFixture, ITestOutputHelper output)
         {
             _sut = gameFixture.GameInstance;
+            _output = output;
+
+            var type = output.GetType();
+            var testMember = type.GetField("test", BindingFlags.Instance | BindingFlags.NonPublic);
+            _test = (ITest)testMember.GetValue(output);
         }
 
         /// <summary>
-        /// Starts the game with a valid text file as input.
+        /// Starts the game with a valid text file as input apart from the method
+        /// InitializeCorrectLettersAccuratelyOnInvalidFileInputAsync which demands
+        /// a invalid text file input.
         /// </summary>
         public async Task InitializeAsync()
         {
-            await _sut.StartNewGameAsync("TestWords.txt");
+            if (_test.DisplayName !=
+                "Hangman.Tests.GameShould.InitializeCorrectLettersAccuratelyOnInvalidFileInputAsync()")
+            {
+                await _sut.StartNewGameAsync("TestWords.txt");
+            }
         }
 
         /// <summary>
