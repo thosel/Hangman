@@ -18,7 +18,8 @@ namespace Hangman.Tests
         /// Initializes a game instance to be the system under test plus the 
         /// current test representation.
         /// </summary>
-        /// <param name="gameFixture"></param>
+        /// <param name="gameFixture">The fixture to retrieve the game instance from.</param>
+        /// <param name="output">Used to retrieve test method information.</param>
         public GameShould(GameFixture gameFixture, ITestOutputHelper output)
         {
             _sut = gameFixture.GameInstance;
